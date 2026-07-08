@@ -4,38 +4,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ayush D. | Portfolio</title>
-    <style>
-        body {
-            font-family: system-ui, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f9f9f9;
-            color: #333;
-        }
+    <title>Ayush D. | Developer & AI Enthusiast</title>
 
-        .container {
-            text-align: center;
-        }
+    <!-- Google Fonts: Caveat (Headers) & JetBrains Mono (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
 
-        h1 {
-            margin-bottom: 5px;
-        }
-
-        p {
-            color: #666;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <div class="container">
-        <h1>Ayush D.</h1>
-        <p>My portfolio is coming soon.</p>
+
+    <!-- Loader -->
+    <div class="loader-wrapper" id="loader-wrapper">
+        <div class="loader"></div>
     </div>
+
+    <!-- Page Wipe Transition -->
+    <div class="wipe-transition" id="wipe-transition"></div>
+
+    <!-- Background Elements -->
+    <div class="dot-matrix-overlay"></div>
+    <svg class="bg-blobs" preserveAspectRatio="xMidYMid slice" viewBox="10 10 80 80">
+        <path fill="var(--cyan)" class="out-top" stroke="var(--stark-black)" stroke-width="0.5" d="M37-5C25.1-14.7,5.7-19.1-9.2-10-28.5,1.8-32.7,31.1-19.8,49c15.5,21.5,52.6,22,67.2,2.3C59.4,35,53.7,8.5,37-5Z"/>
+        <path fill="var(--hot-pink)" class="in-top" stroke="var(--stark-black)" stroke-width="0.5" d="M20.6,4.1C11.6,1.5-1.9,2.5-8,11.2-16.3,23.1-8.2,45.6,7.4,50S42.1,38.9,41,24.5C40.2,14.1,29.4,6.6,20.6,4.1Z"/>
+        <path fill="var(--electric-blue)" class="out-bottom" stroke="var(--stark-black)" stroke-width="0.5" d="M105.9,48.6c-12.4-8.2-29.3-4.8-39.4.8-23.4,12.8-37.7,51.9-19.1,74.1s63.9,15.3,76-5.6c7.6-13.3,1.8-31.1-2.3-43.8C117.6,63.3,114.7,54.3,105.9,48.6Z"/>
+        <path fill="var(--yellow)" class="in-bottom" stroke="var(--stark-black)" stroke-width="0.5" d="M102,67.1c-9.6-6.1-22-3.1-29.5,2-15.4,10.7-19.6,37.5-7.6,47.8s35.9,3.9,44.5-12.5C115.5,92.6,113.9,74.6,102,67.1Z"/>
+    </svg>
+
+    <!-- Navigation -->
+    <nav class="side-nav" id="side-nav">
+        <a href="#hero" class="nav-dot brutalist-border brutalist-shadow brutalist-interactive active"
+            aria-label="Home">
+            <span class="nav-label">Home</span>
+        </a>
+        <a href="#about" class="nav-dot brutalist-border brutalist-shadow brutalist-interactive" aria-label="About">
+            <span class="nav-label">About</span>
+        </a>
+        <a href="#skills" class="nav-dot brutalist-border brutalist-shadow brutalist-interactive" aria-label="Skills">
+            <span class="nav-label">Skills</span>
+        </a>
+        <a href="#projects" class="nav-dot brutalist-border brutalist-shadow brutalist-interactive"
+            aria-label="Projects">
+            <span class="nav-label">Projects</span>
+        </a>
+        <a href="#contact" class="nav-dot brutalist-border brutalist-shadow brutalist-interactive" aria-label="Contact">
+            <span class="nav-label">Contact</span>
+        </a>
+    </nav>
+
+    <!-- 1. Hero Section -->
+    <section id="hero" class="section hero">
+        <div class="hero-content">
+
+            <!-- Floating Tech Icons (Background) -->
+            <svg class="floating-tech-icon icon-python float" viewBox="0 0 100 100" width="80" fill="none"
+                stroke="var(--stark-black)" stroke-width="4">
+                <path
+                    d="M50 15 c-20 0-20 15-20 15 v10 h20 v5 h-25 c-10 0-10 20-10 20 s0 20 15 20 h5 v-15 c0-15 15-15 15-15 h15 c10 0 10-15 10-15 v-15 c0-10-10-10-25-10 z"
+                    fill="var(--electric-blue)" />
+                <path
+                    d="M50 85 c20 0 20-15 20-15 v-10 h-20 v-5 h25 c10 0 10-20 10-20 s0-20-15-20 h-5 v15 c0 15-15 15-15 15 h-15 c-10 0-10 15-10 15 v15 c0 10 10 10 25 10 z"
+                    fill="var(--yellow)" />
+            </svg>
+
+            <svg class="floating-tech-icon icon-react float-alt" viewBox="0 0 100 100" width="90" fill="none"
+                stroke="var(--stark-black)" stroke-width="4">
+                <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(30 50 50)" fill="var(--cyan)"
+                    fill-opacity="0.3" />
+                <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(90 50 50)" fill="var(--cyan)"
+                    fill-opacity="0.3" />
+                <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(150 50 50)" fill="var(--cyan)"
+                    fill-opacity="0.3" />
+                <circle cx="50" cy="50" r="8" fill="var(--hot-pink)" />
+            </svg>
+
+            <h1 class="hero-title">
+                <span class="line">Hi, I'm</span>
+                <span class="line name-highlight">Ayush D.</span>
+            </h1>
+
+            <p class="hero-tagline reveal">
+                $ ./build_agent.sh && create_art()
+            </p>
+
+        </div>
+    </section>
+
+    <!-- 2. About Section -->
+    <section id="about" class="section about-section">
+        <h2 class="section-title reveal">About Me</h2>
+
+        <div class="about-grid">
+            <!-- Left: Text Content -->
+            <div class="about-card brutalist-border brutalist-shadow reveal">
+                <p>Hey! I'm Ayush — a developer and AI enthusiast who loves building intelligent systems that actually
+                    help people.</p>
+                <p>From medical chatbots to autonomous agents, I enjoy turning complex logic into elegant solutions.</p>
+                <p>When I'm not coding, I'm exploring new papers, breaking APIs, or over-engineering side projects.</p>
+            </div>
+
+            <!-- Right: Terminal Graphic -->
+            <div class="about-terminal brutalist-border brutalist-shadow reveal" style="animation-delay: 0.2s">
+                <div class="terminal-header">
+                    <div class="terminal-dot dot-red"></div>
+                    <div class="terminal-dot dot-yellow"></div>
+                    <div class="terminal-dot dot-green"></div>
+                </div>
+                <div class="terminal-code">
+                    <span class="code-comment"># Initialize AI Agent</span>
+                    <span class="code-line"><span class="code-keyword">from</span> agents <span
+                            class="code-keyword">import</span> ReActAgent</span>
+                    <span class="code-line">agent = ReActAgent(</span>
+                    <span class="code-line"> llm=<span class="code-string">"gpt-4"</span>,</span>
+                    <span class="code-line"> tools=[web_search, execute_code]</span>
+                    <span class="code-line">)</span>
+                    <br>
+                    <span class="code-comment"># Execute objective</span>
+                    <span class="code-line">agent.run(<span class="code-string">"Build something
+                            awesome."</span>)</span>
+                    <br>
+                    <span class="code-line"><span class="code-keyword">>></span> SUCCESS: Artifacts created.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Skills Section -->
+    <section id="skills" class="section skills-section">
+        <h2 class="section-title reveal">Tech Stack</h2>
+        <p class="physics-hint reveal">Grab 'em, drag 'em, smash 'em!</p>
+
+        <div class="skills-container reveal" id="physics-container">
+            <span class="skill-tag brutalist-border brutalist-interactive physics-tag"
+                style="background: var(--yellow)">Python</span>
+            <span class="skill-tag brutalist-border brutalist-interactive physics-tag"
+                style="background: var(--neon-green)">JavaScript</span>
+            <span class="skill-tag brutalist-border brutalist-interactive physics-tag"
+                style="background: var(--electric-blue); color: white;">React</span>
+            <span class="skill-tag brutalist-border brutalist-interactive physics-tag"
+                style="background: var(--hot-pink); color: white;">LangChain</span>
+            <span class="skill-tag brutalist-border brutalist-interactive physics-tag"
+                style="background: var(--cyan)">TensorFlow</span>
+            <span class="skill-tag brutalist-border brutalist-interactive physics-tag"
+                style="background: var(--vibrant-purple); color: white;">Node.js</span>
+            <span class="skill-tag brutalist-border brutalist-interactive physics-tag"
+                style="background: var(--bg-color)">Git</span>
+            <span class="skill-tag brutalist-border brutalist-interactive physics-tag"
+                style="background: #fff">Prompt Eng</span>
+        </div>
+    </section>
+
+    <!-- 4. Projects Section -->
+    <section id="projects" class="section projects-section">
+        <h2 class="section-title reveal">Projects</h2>
+
+        <div class="projects-grid">
+
+            <!-- Project 1 -->
+            <article class="project-card brutalist-border brutalist-shadow brutalist-interactive reveal"
+                style="--card-bg: var(--electric-blue);">
+                <div class="overlay"></div>
+                <div class="card-content">
+                    <h3 class="project-title">ReAct Agent</h3>
+                    <p class="project-desc">Autonomous AI agent capable of reasoning, acting, and using tools to solve tasks
+                        step by step.</p>
+                    <div class="project-tags">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">LangChain</span>
+                        <span class="tech-tag">GPT-4</span>
+                    </div>
+                    <a href="#" class="project-link brutalist-border brutalist-interactive">View Code</a>
+                </div>
+            </article>
+
+            <!-- Project 2 -->
+            <article class="project-card brutalist-border brutalist-shadow brutalist-interactive reveal"
+                style="--card-bg: var(--hot-pink); animation-delay: 0.1s;">
+                <div class="overlay"></div>
+                <div class="card-content">
+                    <h3 class="project-title">Med-Bot</h3>
+                    <p class="project-desc">Intelligent medical assistant guiding users through symptoms and health info via
+                        NLP.</p>
+                    <div class="project-tags">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">NLP</span>
+                        <span class="tech-tag">TensorFlow</span>
+                    </div>
+                    <a href="#" class="project-link brutalist-border brutalist-interactive">View Code</a>
+                </div>
+            </article>
+
+            <!-- Project 3 -->
+            <article class="project-card brutalist-border brutalist-shadow brutalist-interactive reveal"
+                style="--card-bg: var(--neon-green); animation-delay: 0.2s;">
+                <div class="overlay"></div>
+                <div class="card-content">
+                    <h3 class="project-title">Portfolio</h3>
+                    <p class="project-desc">This high-contrast Neo-Brutalist portfolio built from scratch. CSS grids,
+                        monospace, and stark shadows.</p>
+                    <div class="project-tags">
+                        <span class="tech-tag">HTML</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">JS</span>
+                    </div>
+                    <a href="#" class="project-link brutalist-border brutalist-interactive">View Source</a>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- 4.5 Arcade Banner Section -->
+    <section id="arcade-banner" class="section games-section" style="min-height: 50vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="game-container brutalist-border brutalist-shadow reveal" style="max-width: 600px; text-align: center; padding: 3rem;">
+            <h2 class="section-title" style="margin-bottom: 1rem; font-size: 3rem;">Arcade Room</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">Take a break from the tech stack and play some custom-built HTML5 canvas games.</p>
+            <button id="open-arcade-btn" class="game-start-btn brutalist-border brutalist-interactive" style="width: 100%;">LAUNCH ARCADE 🕹️</button>
+        </div>
+    </section>
+
+    <!-- 5. Contact Section -->
+    <section id="contact" class="section contact-section">
+        <h2 class="section-title reveal">Connect_</h2>
+
+        <div class="contact-links reveal">
+            <a href="#" class="contact-btn brutalist-border brutalist-shadow brutalist-interactive"
+                style="--btn-color: var(--cyan)">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path
+                        d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 17.07 3.633 16.7 3.633 16.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12" />
+                </svg>
+                GitHub
+            </a>
+
+            <a href="#" class="contact-btn brutalist-border brutalist-shadow brutalist-interactive"
+                style="--btn-color: var(--yellow)">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path
+                        d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                </svg>
+                LinkedIn
+            </a>
+
+            <a href="mailto:#" class="contact-btn brutalist-border brutalist-shadow brutalist-interactive"
+                style="--btn-color: var(--vibrant-purple); color: white;">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="M22 4L12 13 2 4" />
+                </svg>
+                Email
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        > EXEC_PROGRAM: end_of_file.sh<br>
+        © 2026 Ayush D. Built natively.
+    </footer>
+
+    <!-- Full-Screen Arcade Modal -->
+    <div id="arcade-modal" class="arcade-modal hidden">
+        <div class="arcade-modal-content brutalist-border brutalist-shadow">
+            <button id="close-arcade-btn" class="close-btn brutalist-border brutalist-interactive">X</button>
+            <h2 class="section-title" style="margin-bottom: 2rem; color: #fff; text-shadow: 3px 3px 0 #000;">Arcade Room</h2>
+            <div class="games-grid" style="max-width: 1200px;">
+                <!-- Game 1: Retro Brick Breaker (Widescreen) -->
+                <div class="game-container brutalist-border brutalist-shadow">
+                    <div class="game-header">
+                        <h3 class="game-title">Retro Brick Breaker</h3>
+                        <div class="game-score">Score: <span id="bb-score">0</span></div>
+                    </div>
+                    <div class="canvas-wrapper widescreen-wrapper">
+                        <canvas id="brickBreakerCanvas" width="800" height="400"></canvas>
+                        <div class="game-overlay" id="bb-overlay">
+                            <button class="game-start-btn brutalist-border brutalist-interactive" id="bb-start">Play</button>
+                        </div>
+                    </div>
+                    <p class="game-instructions">Use Mouse/Touch to move the paddle.</p>
+                </div>
+
+                <!-- Game 2: Hexagon Fall -->
+                <div class="game-container brutalist-border brutalist-shadow">
+                    <div class="game-header">
+                        <h3 class="game-title">Hexagon Fall</h3>
+                        <div class="game-score">Score: <span id="hf-score">0</span></div>
+                    </div>
+                    <div class="canvas-wrapper">
+                        <canvas id="hexFallCanvas" width="400" height="400"></canvas>
+                        <div class="game-overlay" id="hf-overlay">
+                            <button class="game-start-btn brutalist-border brutalist-interactive" id="hf-start">Play</button>
+                        </div>
+                    </div>
+                    <p class="game-instructions">Click Left/Right sides or use A/D to rotate Hexagon.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matter.js Physics Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>
