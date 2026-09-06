@@ -1,155 +1,8 @@
-// 1. Staggered Bounce Reveal for Title
-const titleElements = document.querySelectorAll('.hero-title .line');
-
-titleElements.forEach((line) => {
-  const textContent = line.textContent.trim();
-  if (!line.classList.contains('name-highlight')) {
-    line.innerHTML = '';
-    textContent.split('').forEach((char) => {
-      const span = document.createElement('span');
-      span.className = 'char-bounce';
-      span.textContent = char === ' ' ? '\u00A0' : char;
-      line.appendChild(span);
-    });
-  } else {
-    line.innerHTML = '';
-    textContent.split('').forEach((char) => {
-      const span = document.createElement('span');
-      span.className = 'char-bounce';
-      span.textContent = char === ' ' ? '\u00A0' : char;
-      line.appendChild(span);
-    });
-  }
-});
-
-// 2. Physics Engine Initialization (Matter.js)
-let engineInit = false;
-function initPhysics() {
-  if (engineInit) return;
-  if (typeof Matter === 'undefined') return; // Ensure Matter is loaded
-  engineInit = true;
-
-  const Engine = Matter.Engine,
-        Render = Matter.Render,
-        Runner = Matter.Runner,
-        MouseConstraint = Matter.MouseConstraint,
-        Mouse = Matter.Mouse,
-        Composite = Matter.Composite,
-        Events = Matter.Events,
-        Body = Matter.Body,
-        Bodies = Matter.Bodies;
-
-  const engine = Engine.create();
-  engine.gravity.y = 0;
-  engine.gravity.x = 0;
-
-  const container = document.getElementById('physics-container');
-  container.classList.add('physics-active');
-  
-  let ground, leftWall, rightWall, topWall;
-
-  function updateWalls() {
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-    const wallThickness = 100;
-    const padding = 0;
-
-    if (ground) Composite.remove(engine.world, [ground, leftWall, rightWall, topWall]);
-
-    ground = Bodies.rectangle(width / 2, height + wallThickness / 2 - padding, width, wallThickness, { isStatic: true });
-    topWall = Bodies.rectangle(width / 2, -wallThickness / 2 + padding, width, wallThickness, { isStatic: true });
-    leftWall = Bodies.rectangle(-wallThickness / 2 + padding, height / 2, wallThickness, height, { isStatic: true });
-    rightWall = Bodies.rectangle(width + wallThickness / 2 - padding, height / 2, wallThickness, height, { isStatic: true });
-
-    Composite.add(engine.world, [ground, leftWall, rightWall, topWall]);
-  }
-
-  updateWalls();
-  window.addEventListener('resize', updateWalls);
-
-  const tags = document.querySelectorAll('.physics-tag');
-  const bodies = [];
-
-  tags.forEach((tag) => {
-    tag.classList.add('physics-active');
-    const tw = tag.offsetWidth;
-    const th = tag.offsetHeight;
-    
-    // Start them around the center
-    const body = Bodies.rectangle(
-      Math.random() * (container.clientWidth - tw) + tw/2,
-      Math.random() * (container.clientHeight - th) + th/2,
-      tw, th,
-      {
-        restitution: 0.9,
-        friction: 0.05,
-        frictionAir: 0.02
-      }
-    );
-    bodies.push({ element: tag, body: body, w: tw, h: th });
-    Composite.add(engine.world, body);
-  });
-
-  const mouse = Mouse.create(container);
-  const mouseConstraint = MouseConstraint.create(engine, {
-      mouse: mouse,
-      constraint: {
-          stiffness: 0.2,
-          render: { visible: false }
-      }
-  });
-  Composite.add(engine.world, mouseConstraint);
-
-  Events.on(engine, 'beforeUpdate', () => {
-    bodies.forEach(b => {
-      const body = b.body;
-      if (body !== mouseConstraint.body) {
-        const driftY = -0.0002; 
-        const swayX = (Math.random() - 0.5) * 0.0001; 
-        
-        Body.applyForce(body, body.position, { x: swayX, y: driftY });
-        
-        if (Math.abs(body.angularVelocity) > 0.02) {
-          Body.setAngularVelocity(body, body.angularVelocity * 0.95);
-        }
-      }
-    });
-  });
-
-  Runner.run(Runner.create(), engine);
-
-  (function render() {
-      bodies.forEach(b => {
-          const { x, y } = b.body.position;
-          const angle = b.body.angle;
-          // Apply transforms to DOM elements based on physics simulation
-          b.element.style.transform = `translate(${x - b.w/2}px, ${y - b.h/2}px) rotate(${angle}rad)`;
-      });
-      requestAnimationFrame(render);
-  })();
-}
-
-// 3. Intersection Observer (Scroll Animations)
+// 1. Intersection Observer (Scroll Animations)
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       entry.target.classList.add('visible');
-      
-      // If this is the hero section, stagger the characters
-      if (entry.target.id === 'hero') {
-        const chars = entry.target.querySelectorAll('.char-bounce');
-        chars.forEach((char, index) => {
-          char.style.animationDelay = `${index * 0.05}s`;
-          char.classList.add('visible');
-        });
-      }
-
-      // Initialize physics when tech stack comes into view
-      if (entry.target.id === 'physics-container') {
-        initPhysics();
-      }
-
-      observer.unobserve(entry.target);
     }
   });
 }, {
@@ -157,9 +10,9 @@ const observer = new IntersectionObserver((entries) => {
   rootMargin: '0px 0px -50px 0px'
 });
 
-document.querySelectorAll('.reveal, .draw-in, #hero, #physics-container').forEach(el => observer.observe(el));
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// 4. Active Nav Dot (Highlight Current Section)
+// 2. Active Nav Dot (Highlight Current Section)
 const sections = document.querySelectorAll('.section');
 const navDots = document.querySelectorAll('.nav-dot');
 
@@ -176,7 +29,7 @@ const sectionObserver = new IntersectionObserver((entries) => {
 
 sections.forEach(section => sectionObserver.observe(section));
 
-// 5. Comic Book Panel Wipe Transition
+// 3. Smooth Page Wipe Transition
 const wipe = document.getElementById('wipe-transition');
 
 document.querySelectorAll('.nav-dot').forEach(dot => {
@@ -184,82 +37,132 @@ document.querySelectorAll('.nav-dot').forEach(dot => {
     e.preventDefault();
     const target = document.querySelector(dot.getAttribute('href'));
     if (target) {
-      // Trigger wipe animation
       wipe.classList.add('active');
       wipe.classList.remove('finish');
       
       setTimeout(() => {
-        // Scroll instantly behind the wipe
         target.scrollIntoView({ behavior: 'auto', block: 'start' });
-        // Slide out
         wipe.classList.remove('active');
         wipe.classList.add('finish');
-      }, 400); // Wait 400ms for wipe to cover screen
+      }, 400);
     }
   });
 });
 
-// 6. Calculate path lengths for draw animations
-document.querySelectorAll('.draw-in path').forEach(path => {
-    const length = path.getTotalLength();
-    path.parentElement.style.setProperty('--path-length', length);
-});
+// 4. Spencer 3D Arc Carousel Engine (with Trackpad Wheel & Touch Swipe)
+let activeCardIndex = 0;
+const cards = document.querySelectorAll('.arc-card');
+const pillBtn = document.getElementById('arc-pill-btn');
+const prevBtn = document.getElementById('arc-prev');
+const nextBtn = document.getElementById('arc-next');
+const track = document.getElementById('arc-track');
+const carouselWrapper = document.querySelector('.arc-carousel-wrapper');
 
-// 7. Brutalist Magnetic Cursor & Trail
-const colors = ['#39FF14', '#00FFFF', '#B026FF', '#FF1493', '#FFE600'];
-let lastTrailTime = 0;
+const projectTitles = [
+  'REACT AGENT',
+  'MED-BOT',
+  'ARCADE ROOM'
+];
 
-const cursorRing = document.createElement('div');
-cursorRing.className = 'cursor-ring';
-document.body.appendChild(cursorRing);
-
-document.addEventListener('mousemove', (e) => {
-  const now = Date.now();
+function updateArcCarousel() {
+  if (!cards || cards.length === 0) return;
+  const total = cards.length;
   
-  // Magnetic Ring Logic
-  const interactables = document.querySelectorAll('.brutalist-interactive, .nav-dot, .project-card');
-  let isHovering = false;
-  let targetNode = null;
-  
-  interactables.forEach(el => {
-    const rect = el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-    if (dist < 80) { // Activation radius
-      isHovering = true;
-      targetNode = { x: cx, y: cy };
+  cards.forEach((card, idx) => {
+    card.classList.remove('active', 'left-card', 'right-card');
+    
+    // Calculate relative diff to active index
+    const diff = (idx - activeCardIndex + total) % total;
+    
+    if (diff === 0) {
+      card.classList.add('active');
+    } else if (diff === 1 || diff === -(total - 1)) {
+      card.classList.add('right-card');
+    } else {
+      card.classList.add('left-card');
     }
   });
 
-  if (isHovering && targetNode) {
-    cursorRing.classList.add('magnetic');
-    cursorRing.style.left = targetNode.x + 'px';
-    cursorRing.style.top = targetNode.y + 'px';
-  } else {
-    cursorRing.classList.remove('magnetic');
-    cursorRing.style.left = e.clientX + 'px';
-    cursorRing.style.top = e.clientY + 'px';
+  // Update dynamic pill button label
+  if (pillBtn && projectTitles[activeCardIndex]) {
+    pillBtn.innerText = projectTitles[activeCardIndex];
+  }
+}
+
+if (cards.length > 0) {
+  // Click on cards
+  cards.forEach((card, idx) => {
+    card.addEventListener('click', () => {
+      activeCardIndex = idx;
+      updateArcCarousel();
+    });
+  });
+
+  // Nav arrow buttons (secondary)
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      activeCardIndex = (activeCardIndex - 1 + cards.length) % cards.length;
+      updateArcCarousel();
+    });
   }
 
-  // Trail Logic
-  if (now - lastTrailTime >= 50) {
-    lastTrailTime = now;
-    const dot = document.createElement('div');
-    dot.className = 'cursor-trail-dot';
-    dot.style.left = e.clientX + 'px';
-    dot.style.top = e.clientY + 'px';
-    dot.style.setProperty('--color', colors[Math.floor(Math.random() * colors.length)]);
-    dot.style.setProperty('--size', (Math.random() * 10 + 6) + 'px');
-    
-    dot.style.transform = `translate(-50%, -50%) rotate(${Math.floor(Math.random() * 45)}deg)`;
-    
-    document.body.appendChild(dot);
-    setTimeout(() => dot.remove(), 600);
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      activeCardIndex = (activeCardIndex + 1) % cards.length;
+      updateArcCarousel();
+    });
   }
-});
 
-// 8. Hide Loader
+  // Trackpad / Mouse Wheel Swipe Navigation (Two-Finger Slide)
+  let isWheelThrottled = false;
+  if (carouselWrapper) {
+    carouselWrapper.addEventListener('wheel', (e) => {
+      // Determine dominant swipe direction (deltaX for horizontal trackpad, deltaY for shift+scroll)
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+
+      if (Math.abs(delta) > 12 && !isWheelThrottled) {
+        isWheelThrottled = true;
+        if (delta > 0) {
+          activeCardIndex = (activeCardIndex + 1) % cards.length;
+        } else {
+          activeCardIndex = (activeCardIndex - 1 + cards.length) % cards.length;
+        }
+        updateArcCarousel();
+
+        // Lock for 450ms so a single flick only steps 1 card over
+        setTimeout(() => {
+          isWheelThrottled = false;
+        }, 450);
+      }
+    }, { passive: true });
+  }
+
+  // Mobile Touch Swipe support
+  let touchStartX = 0;
+  if (track) {
+    track.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', (e) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      const diffX = touchStartX - touchEndX;
+      
+      if (Math.abs(diffX) > 40) {
+        if (diffX > 0) {
+          activeCardIndex = (activeCardIndex + 1) % cards.length;
+        } else {
+          activeCardIndex = (activeCardIndex - 1 + cards.length) % cards.length;
+        }
+        updateArcCarousel();
+      }
+    }, { passive: true });
+  }
+
+  updateArcCarousel();
+}
+
+// 5. Hide Loader
 window.addEventListener('load', () => {
   const loader = document.getElementById('loader-wrapper');
   if (loader) {
@@ -269,9 +172,366 @@ window.addEventListener('load', () => {
   }
   initBrickBreaker();
   initHexFall();
+  initCustomVibingAvatar();
 });
 
-// 8.5 Arcade Modal Logic
+// Custom 2D Interactive Vibing Developer Engine
+function initCustomVibingAvatar() {
+  const canvas = document.getElementById('hero-vibing-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const wrapper = document.getElementById('hero-avatar-wrapper');
+  const vibeBadge = document.getElementById('vibe-badge');
+
+  let time = 0;
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2, targetX: canvas.width / 2, targetY: canvas.height / 2 };
+  
+  // Vibe Color Palettes
+  const vibeModes = [
+    { name: '🎵 VIBING MODE: SYNTHWAVE', primary: '#ff2a8d', secondary: '#00ffff', accent: '#ffe600', codeColor: '#39ff14' },
+    { name: '⚡ VIBING MODE: CYBERPUNK', primary: '#39ff14', secondary: '#ff2a8d', accent: '#00ffff', codeColor: '#00ffff' },
+    { name: '☕ VIBING MODE: LO-FI BEATS', primary: '#ffe600', secondary: '#ff7b00', accent: '#d0a6ff', codeColor: '#ff2a8d' }
+  ];
+  let currentVibeIdx = 0;
+
+  if (wrapper) {
+    wrapper.addEventListener('click', () => {
+      currentVibeIdx = (currentVibeIdx + 1) % vibeModes.length;
+      if (vibeBadge) vibeBadge.innerText = vibeModes[currentVibeIdx].name;
+      
+      // Spawn burst of music particles on vibe change
+      for (let i = 0; i < 8; i++) {
+        spawnMusicParticle(canvas.width / 2 + (Math.random() - 0.5) * 100, 150);
+      }
+    });
+
+    wrapper.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.targetX = e.clientX - rect.left;
+      mouse.targetY = e.clientY - rect.top;
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+      mouse.targetX = canvas.width / 2;
+      mouse.targetY = canvas.height / 2;
+    });
+  }
+
+  // Floating Music Notes Particles
+  let musicParticles = [];
+  const noteSymbols = ['🎵', '🎶', '✨', '⚡', '♫', '🎹'];
+
+  function spawnMusicParticle(x, y) {
+    musicParticles.push({
+      x: x + (Math.random() - 0.5) * 30,
+      y: y,
+      symbol: noteSymbols[Math.floor(Math.random() * noteSymbols.length)],
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: -1.8 - Math.random() * 1.5,
+      opacity: 1,
+      size: 14 + Math.random() * 10,
+      rot: (Math.random() - 0.5) * 0.4
+    });
+  }
+
+  function render() {
+    time += 0.04;
+
+    // Smooth mouse interpolation
+    mouse.x += (mouse.targetX - mouse.x) * 0.08;
+    mouse.y += (mouse.targetY - mouse.y) * 0.08;
+
+    const palette = vibeModes[currentVibeIdx];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const centerX = canvas.width / 2;
+    const baseHeadY = 175;
+
+    // Rhythmic Head & Body Bobbing
+    const headBobY = Math.sin(time * 4) * 7;
+    const bodyBobY = Math.sin(time * 4) * 3;
+    const headTilt = Math.cos(time * 2) * 0.04;
+
+    // Periodically spawn music particles from headphones
+    if (Math.random() < 0.07) {
+      const isLeft = Math.random() > 0.5;
+      spawnMusicParticle(isLeft ? centerX - 75 : centerX + 75, baseHeadY + headBobY - 10);
+    }
+
+    // 1. Background Aura Glow & Soundwaves
+    const glowGradient = ctx.createRadialGradient(centerX, baseHeadY + headBobY, 20, centerX, baseHeadY, 180);
+    glowGradient.addColorStop(0, palette.primary + '33');
+    glowGradient.addColorStop(0.5, palette.secondary + '15');
+    glowGradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = glowGradient;
+    ctx.beginPath();
+    ctx.arc(centerX, baseHeadY, 190, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Equalizer Soundwaves radiating in background
+    ctx.save();
+    ctx.strokeStyle = palette.secondary + '44';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 3; i++) {
+      const r = 110 + i * 25 + Math.sin(time * 5 + i) * 6;
+      ctx.beginPath();
+      ctx.arc(centerX, baseHeadY + headBobY * 0.5, r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // 2. Desk & Laptop Setup
+    const deskY = 320;
+    
+    // Desk Surface
+    ctx.fillStyle = '#1c0733';
+    ctx.beginPath();
+    ctx.roundRect(40, deskY, 370, 70, 16);
+    ctx.fill();
+    ctx.strokeStyle = palette.primary + '66';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // RGB Desk Mat Glow
+    ctx.fillStyle = palette.secondary + '33';
+    ctx.fillRect(80, deskY + 5, 290, 4);
+
+    // Laptop Base & RGB Keyboard
+    const laptopX = centerX - 85;
+    const laptopY = deskY - 10;
+    const laptopW = 170;
+    const laptopH = 14;
+
+    ctx.fillStyle = '#2d124d';
+    ctx.beginPath();
+    ctx.roundRect(laptopX, laptopY, laptopW, laptopH, [4, 4, 10, 10]);
+    ctx.fill();
+
+    // Glowing RGB Keys
+    for (let k = 0; k < 7; k++) {
+      const keyHue = (time * 100 + k * 40) % 360;
+      ctx.fillStyle = `hsla(${keyHue}, 100%, 65%, 0.8)`;
+      ctx.fillRect(laptopX + 25 + k * 18, laptopY + 3, 14, 5);
+    }
+
+    // Laptop Screen Open
+    const screenX = laptopX + 15;
+    const screenY = laptopY - 75;
+    const screenW = 140;
+    const screenH = 75;
+
+    ctx.fillStyle = '#0a0014';
+    ctx.beginPath();
+    ctx.roundRect(screenX, screenY, screenW, screenH, 8);
+    ctx.fill();
+    ctx.strokeStyle = palette.primary;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Screen Code Lines Animation
+    ctx.fillStyle = palette.codeColor;
+    ctx.font = '10px "JetBrains Mono", monospace';
+    const codeLines = [
+      'const ai = new Agent();',
+      'ai.listenToMusic();',
+      'ai.code({ vibe: true });',
+      '// 🚀 Building future'
+    ];
+    codeLines.forEach((line, idx) => {
+      const lineY = screenY + 18 + idx * 15;
+      const alpha = 0.5 + Math.sin(time * 4 + idx) * 0.4;
+      ctx.globalAlpha = alpha;
+      ctx.fillText(line, screenX + 10, lineY);
+    });
+    ctx.globalAlpha = 1;
+
+    // Back of Screen Logo Glow
+    ctx.fillStyle = palette.accent;
+    ctx.beginPath();
+    ctx.arc(centerX, screenY + 38, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 3. Body & Hoodie
+    const bodyY = 240 + bodyBobY;
+    
+    // Cyber Hoodie Base
+    ctx.fillStyle = '#1b0533';
+    ctx.beginPath();
+    ctx.moveTo(centerX - 70, deskY + 10);
+    ctx.lineTo(centerX - 55, bodyY + 30);
+    ctx.quadraticCurveTo(centerX, bodyY + 15, centerX + 55, bodyY + 30);
+    ctx.lineTo(centerX + 70, deskY + 10);
+    ctx.closePath();
+    ctx.fill();
+
+    // Hoodie Collar Accent
+    ctx.strokeStyle = palette.primary;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(centerX - 35, bodyY + 35);
+    ctx.lineTo(centerX, bodyY + 55);
+    ctx.lineTo(centerX + 35, bodyY + 35);
+    ctx.stroke();
+
+    // Hands on Keyboard
+    ctx.fillStyle = '#f5c6a5';
+    ctx.beginPath();
+    ctx.arc(laptopX + 35 + Math.sin(time * 8) * 3, laptopY + 2, 8, 0, Math.PI * 2);
+    ctx.arc(laptopX + 135 + Math.cos(time * 8) * 3, laptopY + 2, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 4. Head & Face (Rotated with headTilt)
+    ctx.save();
+    ctx.translate(centerX, baseHeadY + headBobY);
+    ctx.rotate(headTilt);
+
+    // Neck
+    ctx.fillStyle = '#e8b493';
+    ctx.fillRect(-15, 45, 30, 25);
+
+    // Head Base
+    ctx.fillStyle = '#f5c6a5';
+    ctx.beginPath();
+    ctx.roundRect(-42, -45, 84, 90, 36);
+    ctx.fill();
+
+    // Cool Hair (Stylized Cyber Cut)
+    ctx.fillStyle = '#210038';
+    ctx.beginPath();
+    ctx.moveTo(-45, -25);
+    ctx.quadraticCurveTo(-40, -65, 0, -65);
+    ctx.quadraticCurveTo(40, -65, 45, -25);
+    ctx.quadraticCurveTo(20, -45, 0, -45);
+    ctx.quadraticCurveTo(-20, -45, -45, -25);
+    ctx.fill();
+
+    // Front Hair Bangs
+    ctx.beginPath();
+    ctx.moveTo(-35, -42);
+    ctx.lineTo(-20, -25);
+    ctx.lineTo(-10, -40);
+    ctx.lineTo(5, -22);
+    ctx.lineTo(20, -38);
+    ctx.lineTo(35, -25);
+    ctx.lineTo(40, -42);
+    ctx.closePath();
+    ctx.fill();
+
+    // Glasses Frame
+    ctx.strokeStyle = palette.secondary;
+    ctx.lineWidth = 3.5;
+    ctx.fillStyle = 'rgba(15, 0, 30, 0.7)';
+    
+    // Left Lens
+    ctx.beginPath();
+    ctx.roundRect(-34, -12, 30, 22, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    // Right Lens
+    ctx.beginPath();
+    ctx.roundRect(4, -12, 30, 22, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    // Glasses Bridge
+    ctx.beginPath();
+    ctx.moveTo(-4, -4);
+    ctx.lineTo(4, -4);
+    ctx.stroke();
+
+    // Mouse Tracking Pupils inside Glasses
+    const eyeTargetDx = (mouse.x - centerX) / 18;
+    const eyeTargetDy = (mouse.y - (baseHeadY + headBobY)) / 18;
+    const pupilX = Math.max(-5, Math.min(5, eyeTargetDx));
+    const pupilY = Math.max(-4, Math.min(4, eyeTargetDy));
+
+    ctx.fillStyle = palette.primary;
+    ctx.beginPath();
+    ctx.arc(-19 + pupilX, -1 + pupilY, 4, 0, Math.PI * 2);
+    ctx.arc(19 + pupilX, -1 + pupilY, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Glasses Glint / Reflection
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-30, -9);
+    ctx.lineTo(-20, -3);
+    ctx.moveTo(8, -9);
+    ctx.lineTo(18, -3);
+    ctx.stroke();
+
+    // Happy Vibing Smile
+    ctx.strokeStyle = '#8a3c26';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(0, 18, 10, 0.1 * Math.PI, 0.9 * Math.PI);
+    ctx.stroke();
+
+    // 5. Over-Ear Headphones with Pulsing Equalizer
+    // Band
+    ctx.strokeStyle = palette.primary;
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.arc(0, -10, 48, 1.05 * Math.PI, 1.95 * Math.PI);
+    ctx.stroke();
+
+    // Earcups
+    ctx.fillStyle = '#17002b';
+    ctx.strokeStyle = palette.secondary;
+    ctx.lineWidth = 3;
+
+    // Left Earcup
+    ctx.beginPath();
+    ctx.roundRect(-56, -22, 18, 44, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    // Right Earcup
+    ctx.beginPath();
+    ctx.roundRect(38, -22, 18, 44, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    // Animated Earcup Equalizer Bars inside headphones
+    for (let b = 0; b < 3; b++) {
+      const barH1 = 8 + Math.sin(time * 12 + b * 2) * 6;
+      const barH2 = 8 + Math.cos(time * 12 + b * 2) * 6;
+
+      ctx.fillStyle = palette.accent;
+      ctx.fillRect(-51 + b * 4, -barH1 / 2, 2.5, barH1);
+      ctx.fillRect(43 + b * 4, -barH2 / 2, 2.5, barH2);
+    }
+
+    ctx.restore(); // Restore head transform
+
+    // 6. Draw Floating Music Particles
+    musicParticles.forEach((p, idx) => {
+      p.x += p.vx + Math.sin(time * 3 + idx) * 0.5;
+      p.y += p.vy;
+      p.opacity -= 0.012;
+
+      if (p.opacity <= 0) {
+        musicParticles.splice(idx, 1);
+      } else {
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.font = `${p.size}px sans-serif`;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillText(p.symbol, 0, 0);
+        ctx.restore();
+      }
+    });
+
+    requestAnimationFrame(render);
+  }
+
+  render();
+}
+
+// 6. Arcade Modal Trigger
 const openArcadeBtn = document.getElementById('open-arcade-btn');
 const closeArcadeBtn = document.getElementById('close-arcade-btn');
 const arcadeModal = document.getElementById('arcade-modal');
