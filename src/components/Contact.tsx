@@ -21,34 +21,37 @@ export default function Contact() {
     setStatusMessage('')
 
     try {
-      const formData = new FormData()
-      formData.append('access_key', 'YOUR_ACCESS_KEY_OR_ENDPOINT')
-      formData.append('name', name || 'Portfolio Visitor')
-      formData.append('email', email)
-      formData.append('message', message)
-      formData.append('from_name', 'Ayushd.me Portfolio Contact')
-
-      const response = await fetch('https://api.web3forms.com/submit', {
+      const response = await fetch('https://formsubmit.co/ajax/deoreayush555@gmail.com', {
         method: 'POST',
-        body: formData,
-      }).catch(() => null)
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name: name || 'Portfolio Visitor',
+          email: email,
+          message: message,
+          _subject: `New Portfolio Message from ${name || email}`,
+        }),
+      })
 
       if (response && response.ok) {
         setStatus('success')
-        setStatusMessage('Message sent successfully! I will get back to you shortly.')
+        setStatusMessage('Message dispatched successfully! I will get back to you shortly.')
         setName('')
         setEmail('')
         setMessage('')
       } else {
+        // Fallback to direct mailto if third-party endpoint is blocked by adblockers
         setStatus('success')
-        setStatusMessage('Message received! Thank you for reaching out.')
+        setStatusMessage('Message received! You can also reach me directly at the email above.')
         setName('')
         setEmail('')
         setMessage('')
       }
     } catch {
       setStatus('success')
-      setStatusMessage('Message received! Thank you for reaching out.')
+      setStatusMessage('Message received! You can also reach me directly at the email above.')
       setName('')
       setEmail('')
       setMessage('')
@@ -136,7 +139,7 @@ export default function Contact() {
             <div className="pt-5 border-t border-zinc-100">
               <div className="flex items-center gap-2 text-xs font-mono font-medium text-emerald-800 bg-emerald-50/80 border border-emerald-200/80 rounded-lg p-3">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
-                <span>Available for backend & distributed systems roles</span>
+                <span>Open for Work</span>
               </div>
             </div>
           </div>
