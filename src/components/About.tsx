@@ -106,9 +106,9 @@ export default function About() {
                 <div className="text-zinc-300 pl-2 border-l border-zinc-800 space-y-1 text-[11px]">
                   <p>{"{"}</p>
                   <p className="pl-3"><span className="text-[#00f0ff]">"name"</span>: "Ayush D.",</p>
-                  <p className="pl-3"><span className="text-[#00f0ff]">"role"</span>: "Software & AI Engineer",</p>
-                  <p className="pl-3"><span className="text-[#00f0ff]">"focus"</span>: ["Agentic AI", "Realtime 3D", "Systems"],</p>
-                  <p className="pl-3"><span className="text-[#00f0ff]">"core_stack"</span>: ["Python", "TypeScript", "Three.js", "FastAPI"],</p>
+                  <p className="pl-3"><span className="text-[#00f0ff]">"role"</span>: "Software & AI Systems Engineer",</p>
+                  <p className="pl-3"><span className="text-[#00f0ff]">"focus"</span>: ["Autonomous AI Agents", "Distributed Ledgers", "Large-Scale Pipelines"],</p>
+                  <p className="pl-3"><span className="text-[#00f0ff]">"core_stack"</span>: ["Java 21 / Spring Boot", "Python / LangGraph", "Kafka / Redis", "DuckDB / dbt", "TypeScript / Next.js"],</p>
                   <p className="pl-3"><span className="text-[#00f0ff]">"status"</span>: "Available for ambitious projects",</p>
                   <p className="pl-3"><span className="text-[#00f0ff]">"location"</span>: "Remote / Global"</p>
                   <p>{"}"}</p>

@@ -7,22 +7,22 @@ export interface Skill {
 }
 
 const rawSkills: Array<Omit<Skill, 'pos'>> = [
-  { name: 'Java', category: 'Backend & Systems', iconText: 'JV', color: '#E76F00' },
+  { name: 'Java 21', category: 'Backend & Systems', iconText: 'JV', color: '#E76F00' },
+  { name: 'Spring Boot', category: 'Backend & Systems', iconText: 'SB', color: '#6DB33F' },
   { name: 'Python', category: 'AI & ML', iconText: 'PY', color: '#3776AB' },
   { name: 'TypeScript', category: 'Frontend & Web', iconText: 'TS', color: '#3178C6' },
-  { name: 'JavaScript', category: 'Frontend & Web', iconText: 'JS', color: '#F7DF1E' },
-  { name: 'LangChain', category: 'AI & ML', iconText: 'LC', color: '#10B981' },
   { name: 'LangGraph', category: 'AI & ML', iconText: 'LG', color: '#38BDF8' },
   { name: 'FastAPI', category: 'Backend & Systems', iconText: 'FA', color: '#05998B' },
-  { name: 'Docker', category: 'DevOps & Tools', iconText: 'DK', color: '#2496ED' },
-  { name: 'Vector DBs', category: 'AI & ML', iconText: 'VB', color: '#4F46E5' },
+  { name: 'Kafka', category: 'Backend & Systems', iconText: 'KF', color: '#E11D48' },
+  { name: 'DuckDB', category: 'Backend & Systems', iconText: 'DD', color: '#F59E0B' },
   { name: 'PostgreSQL', category: 'Backend & Systems', iconText: 'PG', color: '#336791' },
   { name: 'Redis', category: 'Backend & Systems', iconText: 'RD', color: '#DC382D' },
-  { name: 'Microservices', category: 'Backend & Systems', iconText: 'MS', color: '#0EA5E9' },
+  { name: 'Docker', category: 'DevOps & Tools', iconText: 'DK', color: '#2496ED' },
   { name: 'React', category: 'Frontend & Web', iconText: '⚛', color: '#61DAFB' },
-  { name: 'Tailwind CSS', category: 'Frontend & Web', iconText: 'TW', color: '#06B6D4' },
-  { name: 'Git', category: 'DevOps & Tools', iconText: 'GT', color: '#F05032' },
-  { name: 'CI/CD', category: 'DevOps & Tools', iconText: 'CI', color: '#22C55E' },
+  { name: 'Next.js', category: 'Frontend & Web', iconText: 'NX', color: '#111827' },
+  { name: 'XGBoost', category: 'AI & ML', iconText: 'XG', color: '#10B981' },
+  { name: 'dbt Core', category: 'Backend & Systems', iconText: 'DB', color: '#FF694B' },
+  { name: 'Airflow', category: 'DevOps & Tools', iconText: 'AF', color: '#017CEE' },
 ]
 
 // Fibonacci sphere distribution with polar offset for even spacing across 16 skills

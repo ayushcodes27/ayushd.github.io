@@ -5,10 +5,10 @@ export default function NavPill() {
   const [activeSection, setActiveSection] = useState<string>('hero')
 
   const navItems = [
-    { id: 'hero', label: 'Home', icon: <Home className="w-4 h-4" /> },
-    { id: 'skills', label: 'Skills', icon: <Cpu className="w-4 h-4" /> },
-    { id: 'projects', label: 'Projects', icon: <FolderGit2 className="w-4 h-4" /> },
-    { id: 'contact', label: 'Contact', icon: <Mail className="w-4 h-4" /> },
+    { id: 'hero', num: '01', label: 'Home', icon: <Home className="w-3.5 h-3.5" /> },
+    { id: 'skills', num: '02', label: 'Skills', icon: <Cpu className="w-3.5 h-3.5" /> },
+    { id: 'projects', num: '03', label: 'Projects', icon: <FolderGit2 className="w-3.5 h-3.5" /> },
+    { id: 'contact', num: '04', label: 'Contact', icon: <Mail className="w-3.5 h-3.5" /> },
   ]
 
   useEffect(() => {
@@ -57,6 +57,7 @@ export default function NavPill() {
               }`}
             >
               {item.icon}
+              <span className="text-[10px] text-zinc-400 group-hover:text-black">{item.num}.</span>
               <span className="hidden sm:inline uppercase">{item.label}</span>
             </button>
           )

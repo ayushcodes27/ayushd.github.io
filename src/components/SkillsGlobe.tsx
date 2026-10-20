@@ -1,245 +1,264 @@
-import { useState, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Html } from '@react-three/drei'
-import * as THREE from 'three'
-import { skills, Skill } from '../data/skillsData'
-import { Cpu, Box } from 'lucide-react'
+import { useState } from 'react'
+import { Terminal, Server, Brain, Wrench, Layers, CheckCircle2, SlidersHorizontal } from 'lucide-react'
 import { TechIcon } from './TechIcons'
+import { motion, AnimatePresence } from 'framer-motion'
 
-// Compact, crisp icon node with distanceFactor=4.6 for clear legibility and non-overlapping spacing
-function SkillIconNode({
-  skill,
-  isFiltered,
-}: {
-  skill: Skill
-  isFiltered: boolean
-}) {
-  return (
-    <group position={skill.pos}>
-      {/* 3D anchor joint point on sphere */}
-      <mesh>
-        <sphereGeometry args={[0.025, 8, 8]} />
-        <meshBasicMaterial color={isFiltered ? skill.color : '#a1a1aa'} />
-      </mesh>
-
-      {/* HTML Overlay with distanceFactor=4.6 */}
-      <Html center distanceFactor={4.6}>
-        <div
-          className={`transition-all duration-300 flex flex-col items-center select-none pointer-events-none ${
-            isFiltered
-              ? 'opacity-100 scale-100'
-              : 'opacity-15 scale-75'
-          }`}
-        >
-          {/* Circular Logo Badge */}
-          <div
-            className="w-5 h-5 rounded-full border border-black bg-white flex items-center justify-center shadow-[1px_1px_0px_#000] p-0.5"
-            style={{ borderColor: isFiltered ? skill.color : '#000' }}
-          >
-            <TechIcon name={skill.name} className="w-3 h-3" />
-          </div>
-
-          {/* Mini Monospace Caption Underneath */}
-          <span className="text-[7.5px] font-mono font-bold bg-black text-white px-1.5 py-[1px] border border-black shadow-[1px_1px_0px_#000] mt-[1px] whitespace-nowrap leading-tight">
-            {skill.name}
-          </span>
-        </div>
-      </Html>
-    </group>
-  )
+interface SkillItem {
+  name: string
+  detail: string
+  projects?: string
+  isCore: boolean
 }
 
-// 3D Wireframe Icosahedron & Orbiting Nodes
-function GlobeMesh({
-  selectedCategory,
-}: {
-  selectedCategory: string
-}) {
-  const icoRef = useRef<THREE.Mesh>(null)
-
-  useFrame((_, delta) => {
-    if (icoRef.current) {
-      icoRef.current.rotation.x += delta * 0.03
-    }
-  })
-
-  return (
-    <group position={[0, 0.08, 0]}>
-      {/* Wireframe Icosahedron */}
-      <mesh ref={icoRef}>
-        <icosahedronGeometry args={[1.35, 1]} />
-        <meshBasicMaterial wireframe color="#000000" transparent opacity={0.2} />
-      </mesh>
-
-      {/* Inner Glowing Core */}
-      <mesh>
-        <sphereGeometry args={[0.65, 16, 16]} />
-        <meshBasicMaterial wireframe color="#00f0ff" transparent opacity={0.1} />
-      </mesh>
-
-      {/* Icon Nodes mapped on Fibonacci sphere */}
-      {skills.map((skill) => {
-        const isFiltered = selectedCategory === 'ALL' || skill.category === selectedCategory
-        return (
-          <SkillIconNode
-            key={skill.name}
-            skill={skill}
-            isFiltered={isFiltered}
-          />
-        )
-      })}
-    </group>
-  )
+interface SkillCategory {
+  title: string
+  subtitle: string
+  icon: typeof Terminal
+  items: SkillItem[]
 }
 
-// Synchronized Plain Text Reference Data for STACK_REFERENCE Static Card
-const techStackCategories = [
+const skillCategories: SkillCategory[] = [
   {
-    category: 'AI & Machine Learning',
-    items: ['Python', 'LangChain', 'LangGraph', 'Vector DBs']
+    title: 'Languages',
+    subtitle: 'Core programming & systems',
+    icon: Terminal,
+    items: [
+      { name: 'Java 21', detail: 'Project Loom, Virtual Threads, Memory Management', projects: 'LedgerFlow • SAGE Engine', isCore: true },
+      { name: 'Python 3.12', detail: 'AsyncIO, Pydantic v2, Vectorized Computing', projects: 'DocAgent • SAGE Engine', isCore: true },
+      { name: 'SQL (Postgres/DuckDB)', detail: 'Complex Aggregations, Index Optimization, EXPLAIN', projects: 'LedgerFlow • Aviate', isCore: true },
+      { name: 'TypeScript', detail: 'Strict Type Safety, Generics, Modern ESNext', projects: 'Aviate • ClinicFlow', isCore: true },
+      // Extended skills revealed on "All Technologies"
+      { name: 'Go (Golang)', detail: 'Goroutines, Channels, Low-Overhead Network Services', isCore: false },
+      { name: 'C / C++', detail: 'Systems Programming, Memory Pointer Arithmetic', isCore: false },
+    ],
   },
   {
-    category: 'Backend & Distributed Systems',
-    items: ['Java', 'FastAPI', 'PostgreSQL', 'Redis', 'Microservices']
+    title: 'Core Systems',
+    subtitle: 'High-throughput backend architecture',
+    icon: Server,
+    items: [
+      { name: 'Kafka KRaft', detail: 'Partitioning strategies, consumer groups, exactly-once semantics', projects: 'LedgerFlow • SAGE Engine', isCore: true },
+      { name: 'Redis 7', detail: 'Distributed locks (Redisson), sliding-window rate limiting, Lua scripts', projects: 'LedgerFlow • SAGE Engine', isCore: true },
+      { name: 'Spring Boot 3', detail: 'High-concurrency REST, JPA Optimistic Locking, STOMP WebSockets', projects: 'LedgerFlow • ClinicFlow', isCore: true },
+      { name: 'PostgreSQL', detail: 'Two-tier concurrency control, ACID isolation, Outbox Pattern', projects: 'LedgerFlow • DocAgent', isCore: true },
+      { name: 'DuckDB', detail: 'Embedded OLAP, Vectorized Execution, Sub-Second Queries', projects: 'Aviate Data Pipeline', isCore: true },
+      { name: 'FastAPI', detail: 'Asynchronous Microservices, High-Performance I/O', projects: 'DocAgent • SAGE Engine', isCore: true },
+      // Extended
+      { name: 'GraphQL', detail: 'Federated Schemas, DataLoader, Query Depth Limits', isCore: false },
+      { name: 'gRPC / Protobuf', detail: 'Binary Protocol, Bidirectional Streaming RPCs', isCore: false },
+    ],
   },
   {
-    category: 'Frontend & Web Technologies',
-    items: ['TypeScript', 'JavaScript', 'React', 'Tailwind CSS']
+    title: 'AI & Agentic Systems',
+    subtitle: 'Autonomous workflows & ML inference',
+    icon: Brain,
+    items: [
+      { name: 'LangGraph', detail: 'Cyclic state machines, ReAct reasoning loops, self-correction', projects: 'DocAgent', isCore: true },
+      { name: 'Multimodal LLMs', detail: 'Gemini 2.5 Flash & GPT-4o Vision, Structured Output Extraction', projects: 'DocAgent', isCore: true },
+      { name: 'XGBoost', detail: 'Session-level behavioral classification, sliding-window entropy', projects: 'SAGE Engine', isCore: true },
+      { name: 'Vector Stores & RAG', detail: 'Embeddings, Cosine Similarity, Deterministic Grounding', projects: 'DocAgent', isCore: true },
+      // Extended
+      { name: 'Hugging Face / PyTorch', detail: 'Transformer Tokenization, Local Embedding Serving', isCore: false },
+      { name: 'NLP Pipelines', detail: 'Named Entity Recognition, Document Segmentation', isCore: false },
+    ],
   },
   {
-    category: 'Developer Tooling & DevOps',
-    items: ['Docker', 'Git', 'CI/CD']
-  }
+    title: 'Infrastructure & Tools',
+    subtitle: 'Deployment, pipelines & data ops',
+    icon: Wrench,
+    items: [
+      { name: 'Docker & Compose', detail: 'Multi-stage builds, non-root security, container networking', projects: 'All Flagship Projects', isCore: true },
+      { name: 'Apache Airflow', detail: 'Batch DAG scheduling, SLA monitoring, backfill runs', projects: 'Aviate Data Pipeline', isCore: true },
+      { name: 'dbt Core', detail: 'Star-schema dimensional modeling, 8 automated quality tests', projects: 'Aviate Data Pipeline', isCore: true },
+      { name: 'Git & GitHub Actions', detail: 'Automated CI/CD pipelines, semantic releases', projects: 'All Repositories', isCore: true },
+      // Extended
+      { name: 'AWS (S3, ECS, IAM)', detail: 'Cloud Storage, Managed Containers, Role Policies', isCore: false },
+      { name: 'Linux Internals', detail: 'cgroups, epoll I/O multiplexing, Bash automation', isCore: false },
+    ],
+  },
+]
+
+const coreFundamentals = [
+  'Distributed Consensus',
+  'Concurrency & Thread Safety',
+  'ACID Transactions & Isolation',
+  'Database Indexing & B-Trees',
+  'Microservices & Saga Pattern',
+  'Event-Driven Architecture',
+  'Idempotent API Design',
+  'Cache Stampede Mitigation',
+  'Low-Latency Rate Limiting',
+  'Fault Tolerance & Circuit Breaking',
 ]
 
 export default function SkillsGlobe() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
-
-  const categories = ['ALL', 'AI & ML', 'Backend & Systems', 'Frontend & Web', 'DevOps & Tools']
+  const [depthMode, setDepthMode] = useState<'core' | 'all'>('core')
+  const [selectedSkill, setSelectedSkill] = useState<string | null>(null)
 
   return (
-    <section id="skills" className="py-20 bg-[#f7f7f8] border-b-2 border-black dot-pattern relative">
+    <section id="skills" className="py-20 md:py-28 bg-[#fbfbfb] border-b border-zinc-200/80 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+        {/* Section Header with Depth Toggle */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <div className="inline-flex items-center gap-2 bg-black text-white px-3 py-1 text-xs font-mono font-bold mb-3 border-2 border-black shadow-[3px_3px_0px_#000]">
-              <Cpu className="w-3.5 h-3.5 text-[#00f0ff]" />
-              <span>SKILLS_MATRIX_3D</span>
+            <div className="inline-flex items-center gap-2 bg-zinc-100 border border-zinc-200 text-zinc-700 px-3 py-1 rounded-full text-xs font-mono font-medium mb-3 shadow-sm">
+              <Layers className="w-3.5 h-3.5 text-zinc-600" />
+              <span>TECHNICAL COMPETENCIES</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl font-black text-black tracking-tight font-display uppercase">
-              TECHNICAL PROFICIENCIES
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-950 tracking-tight font-display uppercase">
+              SKILLS & ARCHITECTURAL DEPTH
             </h2>
-            <p className="text-zinc-700 text-sm sm:text-base font-mono mt-1">
-              Interactive 3D icon sphere with Fibonacci distribution and static stack reference.
+            <p className="text-zinc-600 text-sm sm:text-base font-sans mt-2 max-w-2xl leading-relaxed">
+              Granular competencies across backend distributed systems, agentic AI, and data pipelines. Click any skill to inspect project evidence.
             </p>
           </div>
 
-          {/* Category Filter Tabs */}
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 text-xs font-mono font-bold border-2 transition-all ${
-                  selectedCategory === cat
-                    ? 'bg-black text-[#00f0ff] border-black shadow-[3px_3px_0px_#00f0ff]'
-                    : 'bg-white text-black border-black shadow-[2px_2px_0px_#000] hover:bg-zinc-100'
-                }`}
+          {/* Interactive Depth Toggle: Core Stack vs All Technologies */}
+          <div className="flex items-center p-1 bg-zinc-200/60 rounded-xl border border-zinc-300/60 shadow-inner self-start md:self-auto">
+            <button
+              onClick={() => setDepthMode('core')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
+                depthMode === 'core'
+                  ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200/80'
+                  : 'text-zinc-600 hover:text-zinc-900'
+              }`}
+            >
+              <span>Core Stack</span>
+            </button>
+            <button
+              onClick={() => setDepthMode('all')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
+                depthMode === 'all'
+                  ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200/80'
+                  : 'text-zinc-600 hover:text-zinc-900'
+              }`}
+            >
+              <SlidersHorizontal className="w-3 h-3" />
+              <span>All Technologies</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 4-Column Responsive Tabular Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+          {skillCategories.map((cat) => {
+            const Icon = cat.icon
+            const displayedItems = depthMode === 'core' 
+              ? cat.items.filter(i => i.isCore) 
+              : cat.items
+
+            return (
+              <div
+                key={cat.title}
+                className="bg-white border border-zinc-200/90 rounded-xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-zinc-300 transition-all flex flex-col justify-between"
               >
-                {cat}
-              </button>
+                <div>
+                  {/* Category Header */}
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-9 h-9 rounded-lg bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800 shrink-0">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-display font-bold text-base text-zinc-900 leading-tight">
+                        {cat.title}
+                      </h3>
+                      <p className="text-[11px] font-sans text-zinc-500 leading-tight">
+                        {cat.subtitle}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Skills Table List with Concrete Evidence */}
+                  <div className="mt-5 space-y-3 border-t border-zinc-100 pt-4">
+                    <AnimatePresence>
+                      {displayedItems.map((item) => {
+                        const isSelected = selectedSkill === item.name
+                        return (
+                          <motion.div
+                            key={item.name}
+                            initial={{ opacity: 0, y: 4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setSelectedSkill(isSelected ? null : item.name)}
+                            className={`p-2 rounded-lg transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-zinc-100/90 border border-zinc-300'
+                                : 'hover:bg-zinc-50 border border-transparent'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <TechIcon name={item.name} className="w-3.5 h-3.5 shrink-0 opacity-80" />
+                                <span className="font-mono font-semibold text-xs text-zinc-900">
+                                  {item.name}
+                                </span>
+                              </div>
+                              {item.projects && (
+                                <span className="text-[9.5px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60 shrink-0">
+                                  In Case Study
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Concrete Architectural Bullet Point */}
+                            <p className="text-[11px] font-sans text-zinc-600 mt-1 leading-snug">
+                              {item.detail}
+                            </p>
+
+                            {/* Direct Project Evidence on click or hover */}
+                            {item.projects && (
+                              <div className="mt-1.5 text-[10.5px] font-mono text-zinc-500 flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                                <span>Evidence: {item.projects}</span>
+                              </div>
+                            )}
+                          </motion.div>
+                        )
+                      })}
+                    </AnimatePresence>
+                  </div>
+                </div>
+
+                {/* Footer Count Pill */}
+                <div className="mt-5 pt-3 border-t border-zinc-100 flex items-center justify-between text-[11px] font-mono text-zinc-400">
+                  <span>{displayedItems.length} competencies</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* --- SYSTEM CONCEPTS & CS FUNDAMENTALS SECTION --- */}
+        <div className="mt-12 p-6 sm:p-7 bg-white border border-zinc-200/90 rounded-xl shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 className="font-display font-bold text-base text-zinc-950 uppercase tracking-tight">
+                System Concepts & CS Fundamentals
+              </h3>
+              <p className="text-xs font-sans text-zinc-500 mt-0.5">
+                Core architectural paradigms applied across high-concurrency systems, storage engines, and multi-tenant backends.
+              </p>
+            </div>
+            <span className="text-xs font-mono font-medium text-zinc-400 shrink-0">
+              10 Foundational Principles
+            </span>
+          </div>
+
+          {/* Minimal Pill-Tag Area for Core Fundamentals */}
+          <div className="flex flex-wrap gap-2 pt-2 border-t border-zinc-100">
+            {coreFundamentals.map((concept) => (
+              <span
+                key={concept}
+                className="border border-zinc-200 bg-zinc-50/80 text-zinc-800 px-3 py-1.5 text-xs font-mono rounded-lg font-medium shadow-sm hover:border-zinc-300 hover:bg-zinc-100 transition-colors"
+              >
+                ✦ {concept}
+              </span>
             ))}
           </div>
         </div>
 
-        {/* 2-Column Layout: Primary 3D Icon Globe + Static Tech List Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          
-          {/* Left Column: Centered 3D Icon Globe Canvas with safe margin */}
-          <div className="lg:col-span-7 bg-white border-2 border-black shadow-[8px_8px_0px_#000] relative h-[440px] sm:h-[500px] lg:h-auto min-h-[460px] overflow-hidden flex flex-col">
-            {/* Viewport Top Bar */}
-            <div className="bg-zinc-900 text-white px-4 py-2 border-b-2 border-black flex items-center justify-between text-xs font-mono z-10">
-              <span className="flex items-center gap-2">
-                <Box className="w-3.5 h-3.5 text-[#00f0ff]" />
-                <span>THREE.JS // ICON_SPHERE_3D</span>
-              </span>
-              <span className="text-[#00f0ff] font-bold">CLICK & DRAG TO SPIN</span>
-            </div>
-
-            {/* R3F Canvas */}
-            <div className="flex-1 relative cursor-grab active:cursor-grabbing">
-              <Canvas
-                camera={{ position: [0, 0, 5.3], fov: 38 }}
-                gl={{ antialias: true, alpha: true }}
-              >
-                <ambientLight intensity={1.3} />
-                <directionalLight position={[5, 5, 5]} intensity={1.2} />
-                <directionalLight position={[-5, -5, -3]} intensity={0.6} />
-                <OrbitControls
-                  enableZoom={false}
-                  autoRotate
-                  autoRotateSpeed={0.8}
-                  enablePan={false}
-                />
-                <GlobeMesh
-                  selectedCategory={selectedCategory}
-                />
-              </Canvas>
-
-              {/* Bottom Floating Legend */}
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md border-2 border-black px-3.5 py-1 text-xs font-mono flex items-center gap-2 shadow-[2px_2px_0px_#000] whitespace-nowrap pointer-events-none z-10">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                <span>Active Nodes: {skills.filter(s => selectedCategory === 'ALL' || s.category === selectedCategory).length} of {skills.length}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: ONE Static Tech Stack Reference Card (Passive Plain Text) */}
-          <div className="lg:col-span-5 bg-white border-2 border-black p-6 sm:p-7 shadow-[8px_8px_0px_#000] flex flex-col justify-between">
-            <div>
-              {/* Header */}
-              <div className="flex items-center justify-between border-b-2 border-black pb-3 mb-5">
-                <span className="text-xs font-mono font-bold bg-black text-white px-2.5 py-0.5 border border-black shadow-[1px_1px_0px_#000]">
-                  STACK_REFERENCE
-                </span>
-                <span className="text-xs font-mono text-zinc-500 font-semibold">
-                  PASSIVE INDEX
-                </span>
-              </div>
-
-              {/* Categorized Plain Text Stack */}
-              <div className="space-y-5">
-                {techStackCategories.map((group, idx) => (
-                  <div key={idx} className="space-y-1.5">
-                    <h3 className="text-xs font-mono font-bold text-black uppercase tracking-wider flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-[#00f0ff] border border-black inline-block" />
-                      <span>{group.category}</span>
-                    </h3>
-                    <div className="flex flex-wrap gap-1.5 pl-3 border-l-2 border-zinc-200">
-                      {group.items.map((tech, tIdx) => (
-                        <span
-                          key={tIdx}
-                          className="inline-block text-xs font-mono text-zinc-800 bg-zinc-50 border border-zinc-300 px-2 py-0.5 font-medium"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Bottom Card Summary Note */}
-            <div className="mt-6 pt-4 border-t-2 border-black text-[11px] font-mono text-zinc-600 flex items-center justify-between">
-              <span>● Production Toolchain</span>
-              <span className="text-black font-bold">2026 STACK</span>
-            </div>
-          </div>
-
-        </div>
       </div>
     </section>
   )
