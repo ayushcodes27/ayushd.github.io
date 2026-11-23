@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion'
-import { ArrowDown, Mail } from 'lucide-react'
+import { ArrowDown, ArrowUpRight, FileText } from 'lucide-react'
 import LottieMascot from './LottieMascot'
 
 export default function Hero() {
   return (
     <section id="hero" className="relative pt-28 pb-20 md:pt-36 md:pb-28 border-b border-zinc-200/80 bg-white overflow-hidden">
-      {/* Subtle, low-opacity ambient background grid (dimmed to ~2.5% opacity) */}
-      <div className="absolute inset-0 grid-pattern pointer-events-none opacity-40" />
+      {/* Soft Radial Ambient Depth & Subtle Dot Grid */}
+      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none" />
+      <div className="absolute top-1/2 right-[5%] -translate-y-1/2 w-[550px] h-[550px] bg-gradient-to-tr from-emerald-100/35 via-teal-50/20 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute -top-24 left-1/4 w-[400px] h-[400px] bg-gradient-to-br from-neutral-100/60 to-transparent rounded-full blur-2xl pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -21,7 +23,7 @@ export default function Hero() {
               {/* Refined Status Pill */}
               <div className="inline-flex items-center gap-2 bg-zinc-100/80 border border-zinc-200/90 text-zinc-800 px-3 py-1 rounded-full text-xs font-mono font-medium mb-6 shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>DEVELOPER</span>
+                <span>BACKEND & SYSTEMS ENGINEER</span>
               </div>
 
               {/* Bold Display Headline */}
@@ -34,22 +36,32 @@ export default function Hero() {
                 Software engineer driven by strong systems fundamentals and practical problem-solving. Exploring the intersection of scalable backend engineering, distributed data, and modern AI.
               </p>
 
-              {/* Action Buttons: 2 Clear Primary CTAs */}
-              <div className="flex flex-wrap items-center gap-4">
+              {/* Action Buttons: Unified Sans-Serif CTAs with Smooth Anchor Scroll */}
+              <div className="flex flex-wrap items-center gap-4 font-sans">
                 <a
                   href="#projects"
-                  className="inline-flex items-center justify-center gap-2 bg-zinc-900 text-white font-mono font-medium px-6 py-3.5 rounded-lg hover:bg-zinc-800 transition-all text-sm shadow-sm hover:shadow"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    const el = document.getElementById('projects')
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth' })
+                    }
+                  }}
+                  className="inline-flex items-center justify-center gap-2 bg-zinc-900 text-white font-medium px-6 py-3.5 rounded-lg hover:bg-zinc-800 transition-all text-sm shadow-sm hover:shadow cursor-pointer"
                 >
-                  <span>VIEW PROJECTS</span>
+                  <span>View Projects</span>
                   <ArrowDown className="w-4 h-4 text-zinc-400" />
                 </a>
 
                 <a
-                  href="#contact"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-zinc-900 font-mono font-medium px-6 py-3.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 transition-all text-sm shadow-sm hover:shadow"
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-zinc-900 font-medium px-6 py-3.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 transition-all text-sm shadow-sm hover:shadow group cursor-pointer"
                 >
-                  <Mail className="w-4 h-4 text-zinc-500" />
-                  <span>GET IN TOUCH</span>
+                  <FileText className="w-4 h-4 text-zinc-500 group-hover:text-zinc-900 transition-colors" />
+                  <span>View Resume</span>
+                  <ArrowUpRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-900 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </a>
               </div>
             </motion.div>

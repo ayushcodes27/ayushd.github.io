@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Lenis from 'lenis'
 import 'lenis/dist/lenis.css'
 import Navbar from './components/Navbar'
@@ -8,12 +9,15 @@ import Projects from './components/Projects'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import ProjectSubpage from './components/ProjectSubpage'
+import CommandPalette from './components/CommandPalette'
+import NotFound from './components/NotFound'
 import { projects } from './data/projects'
 
 export default function App() {
   const [currentPath, setCurrentPath] = useState<string>(
     typeof window !== 'undefined' ? window.location.pathname || window.location.hash : '/'
   )
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false)
 
   // Initialize buttery momentum scroll via Lenis
   useEffect(() => {
@@ -36,19 +40,37 @@ export default function App() {
     }
   }, [])
 
+  // Listen to navigation events
   useEffect(() => {
     const handleLocationChange = () => {
-      // Support standard pathname /projects/[slug] or hash #/projects/[slug]
       const path = window.location.pathname !== '/' ? window.location.pathname : window.location.hash
       setCurrentPath(path)
     }
-
 
     window.addEventListener('popstate', handleLocationChange)
     window.addEventListener('hashchange', handleLocationChange)
     return () => {
       window.removeEventListener('popstate', handleLocationChange)
       window.removeEventListener('hashchange', handleLocationChange)
+    }
+  }, [])
+
+  // Global Command Palette listeners (Cmd+K / Ctrl+K and custom event)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setIsPaletteOpen((prev) => !prev)
+      }
+    }
+
+    const handleOpenCustom = () => setIsPaletteOpen(true)
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('open-command-palette', handleOpenCustom)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('open-command-palette', handleOpenCustom)
     }
   }, [])
 
@@ -70,36 +92,67 @@ export default function App() {
     : null
 
   const handleBackToOverview = () => {
-    window.history.pushState({}, '', '/#projects')
+    window.history.pushState({}, '', '/')
     window.dispatchEvent(new Event('popstate'))
   }
 
-  // Render dedicated subpage if routed to /projects/[slug]
-  if (activeSubpageProject) {
-    return (
-      <div className="min-h-screen bg-[#fafafa] text-zinc-900 font-sans selection:bg-zinc-900 selection:text-white">
-        <ProjectSubpage project={activeSubpageProject} onBack={handleBackToOverview} />
-        <Footer />
-      </div>
+  const isInvalidRoute =
+    Boolean(currentSlug && !activeSubpageProject) ||
+    Boolean(
+      currentPath !== '/' &&
+      !currentPath.startsWith('/#') &&
+      !currentPath.startsWith('#') &&
+      !currentPath.includes('/projects/')
     )
-  }
 
-  // Standard Main Portfolio Overview
   return (
     <div className="min-h-screen bg-[#fafafa] text-zinc-900 font-sans selection:bg-zinc-900 selection:text-white relative">
-      {/* Sleek Top Sticky Header */}
-      <Navbar />
+      <AnimatePresence mode="wait">
+        {isInvalidRoute ? (
+          <motion.div
+            key="not-found"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+          >
+            <NotFound onBackHome={handleBackToOverview} />
+          </motion.div>
+        ) : activeSubpageProject ? (
+          <motion.div
+            key={`subpage-${activeSubpageProject.slug}`}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+          >
+            <ProjectSubpage project={activeSubpageProject} onBack={handleBackToOverview} />
+            <Footer />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="overview"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+          >
+            <Navbar />
+            <main className="relative">
+              <Hero />
+              <Projects />
+              <Contact />
+            </main>
+            <Footer />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Main Sections */}
-      <main className="relative">
-        <Hero />
-        {/* <SkillsGlobe /> (Removed for now per user request) */}
-        <Projects />
-        <Contact />
-      </main>
-
-      {/* 1-Line Minimal Footer Framing */}
-      <Footer />
+      {/* Global Command Palette modal */}
+      <CommandPalette
+        isOpen={isPaletteOpen}
+        onClose={() => setIsPaletteOpen(false)}
+      />
     </div>
   )
 }
